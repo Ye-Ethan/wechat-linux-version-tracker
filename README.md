@@ -38,6 +38,7 @@
 3. 手动触发一次工作流：**Actions → Daily WeChat Linux Version Check → Run workflow**，生成 `gh-pages` 分支。
 4. 在 **Settings → Pages** 中将 **Source** 设为 **Deploy from a branch**，分支选择 **`gh-pages` / `(root)`**。
 5. 访问 `https://<用户名>.github.io/<仓库名>/` 查看首页，`.../latest.json` 获取版本数据。
+6. 替换 `public/CNAME` 中的域名为自定义域名。
 
 ## 本地测试
 

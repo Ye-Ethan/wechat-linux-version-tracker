@@ -46,6 +46,7 @@ jobs:
 
           python3 scripts/build_site.py "$VERSION" prev.json public/latest.json
           cp web/index.html public/index.html
+          cp CNAME public/CNAME
 
           echo "----- public/latest.json -----"
           cat public/latest.json
