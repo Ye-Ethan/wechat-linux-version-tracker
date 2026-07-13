@@ -1,0 +1,59 @@
+name: Daily WeChat Linux Version Check
+
+on:
+  schedule:
+    # 每天 UTC 00:00（北京时间 08:00）运行
+    - cron: "0 0 * * *"
+  workflow_dispatch: {} # 支持手动触发
+
+# 部署到 gh-pages 分支需要写权限
+permissions:
+  contents: write
+
+concurrency:
+  group: version-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (main)
+        uses: actions/checkout@v4
+
+      - name: Detect latest version
+        id: detect
+        run: |
+          set -euo pipefail
+          VERSION="$(python3 scripts/detect_version.py)"
+          if [ -z "$VERSION" ]; then
+            echo "::error::未能探测到版本号"
+            exit 1
+          fi
+          echo "检测到版本: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build site output
+        env:
+          VERSION: ${{ steps.detect.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p public
+
+          # 拉取已发布的旧 latest.json，用于在版本未变更时保留原始 updateTime
+          RAW_URL="https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/gh-pages/latest.json"
+          curl -fsSL "$RAW_URL" -o prev.json 2>/dev/null || true
+
+          python3 scripts/build_site.py "$VERSION" prev.json public/latest.json
+          cp web/index.html public/index.html
+
+          echo "----- public/latest.json -----"
+          cat public/latest.json
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          commit_message: "chore: update to WeChat ${{ steps.detect.outputs.version }}"
