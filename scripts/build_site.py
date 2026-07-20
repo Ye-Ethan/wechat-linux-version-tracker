@@ -24,6 +24,9 @@ def main() -> int:
 
     prev_version = ""
     prev_update = ""
+    current_time = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%dT%H:%M:%SZ"
+    )
     if prev_path and os.path.isfile(prev_path):
         try:
             with open(prev_path, "r", encoding="utf-8") as f:
@@ -36,20 +39,18 @@ def main() -> int:
     if version == prev_version and prev_update:
         update_time = prev_update
     else:
-        update_time = datetime.datetime.now(datetime.timezone.utc).strftime(
-            "%Y-%m-%dT%H:%M:%SZ"
-        )
+        update_time = current_time
 
     os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(
-            {"currentVersion": version, "updateTime": update_time},
+            {"currentVersion": version, "updateTime": update_time , "detectTime": current_time},
             f,
             ensure_ascii=False,
         )
         f.write("\n")
 
-    print(f"currentVersion={version} updateTime={update_time}")
+    print(f"currentVersion={version} updateTime={update_time} detectTime={current_time}")
     return 0
 
 

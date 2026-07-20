@@ -5,7 +5,7 @@
 通过 GitHub Actions 每天定时探测微信官方安装包的版本，并将结果发布为：
 
 - 一个**网站首页**（`index.html`），展示当前版本与更新时间；
-- 一个 **`latest.json`** 文件：`{"currentVersion":"x.x.x.x","updateTime":"ISO8601"}`。
+- 一个 **`latest.json`** 文件：`{"currentVersion":"x.x.x.x","updateTime":"ISO8601","detectTime":"ISO8601"}`。
 
 产物统一发布到独立的 **`gh-pages`** 分支（与源码 `main` 分支分离）。
 
@@ -21,24 +21,26 @@
 | --- | --- |
 | `.github/workflows/daily-check.yml` | GitHub Actions 工作流：每日定时 / 手动触发 |
 | `scripts/detect_version.py` | 探测微信 `.deb` 的版本号 |
-| `scripts/build_site.py` | 生成 `latest.json`（版本未变更时保留原始 `updateTime`） |
+| `scripts/build_site.py` | 生成 `latest.json` |
 | `web/index.html` | 网站首页模板（前端读取 `latest.json` 展示） |
+| `CNAME` | 自定义域名配置文件（可选） | |
 
 ## 工作流逻辑
 
 1. 定时（默认每天 UTC 00:00 / 北京时间 08:00）或手动触发；
+> 注意： 在 GitHub Actions 工作流运行的高负载期间（例如每个小时或者每天的开始），schedule 事件可能会被延迟执行（一般在2-3小时内完成）。
 2. 运行 `detect_version.py` 探测最新版本；
 3. 读取 `gh-pages` 分支已有的 `latest.json`：版本一致则沿用旧 `updateTime`，否则记录当前时间；
 4. 将 `index.html` + `latest.json` 发布到 `gh-pages` 分支。
 
 ## 启用步骤
 
-1. 将本仓库推送到 GitHub。
+1. fork 本仓库到 GitHub。
 2. 在 **Settings → Actions → General → Workflow permissions** 中选择 **Read and write permissions**（工作流需要写权限以推送到 `gh-pages`）。
 3. 手动触发一次工作流：**Actions → Daily WeChat Linux Version Check → Run workflow**，生成 `gh-pages` 分支。
 4. 在 **Settings → Pages** 中将 **Source** 设为 **Deploy from a branch**，分支选择 **`gh-pages` / `(root)`**。
-5. 访问 `https://<用户名>.github.io/<仓库名>/` 查看首页，`.../latest.json` 获取版本数据。
-6. 替换 `public/CNAME` 中的域名为自定义域名。
+5. （可选）替换/删除 `main` 分支下的 `CNAME` 中的域名以实现自定义域名。
+6. 访问 `https://<用户名>.github.io/<仓库名>/` 查看首页，`.../latest.json` 获取版本数据。
 
 ## 本地测试
 

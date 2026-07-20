@@ -46,7 +46,7 @@ jobs:
 
           python3 scripts/build_site.py "$VERSION" prev.json public/latest.json
           cp web/index.html public/index.html
-          cp CNAME public/CNAME
+          test -f CNAME && cp CNAME public/ || echo "警告: CNAME 缺失，可能未配置域名"
 
           echo "----- public/latest.json -----"
           cat public/latest.json
