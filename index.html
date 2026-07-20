@@ -68,7 +68,9 @@
       font-variant-numeric: tabular-nums;
       word-break: break-all;
     }
-    .updated { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+    .updated, .detectected { color: var(--muted); font-size: 13px}
+    .updated { margin-bottom: 28px 28px 5px 28px; }
+    .detectected { margin-top: 5px 28px 28px 28px; }
     .actions { display: flex; flex-direction: column; gap: 10px; }
     .btn {
       display: block;
@@ -99,6 +101,7 @@
     <p class="version-label">当前版本</p>
     <p class="version" id="version"><span class="loading">···</span></p>
     <p class="updated" id="updated">加载中…</p>
+    <p class="detectected" id="detectTime">加载中…</p>
 
     <div class="actions">
       <a class="btn btn-primary" href="https://linux.weixin.qq.com/">前往微信 Linux版 官方下载页</a>
@@ -125,11 +128,13 @@
       .then((data) => {
         document.getElementById("version").textContent = data.currentVersion || "未知";
         document.getElementById("updated").textContent = "更新于 " + fmt(data.updateTime);
+        document.getElementById("detectTime").textContent = "探测于 " + fmt(data.detectTime);
         document.title = `微信 Linux ${data.currentVersion || ""} · 版本追踪`;
       })
       .catch(() => {
         document.getElementById("version").textContent = "—";
         document.getElementById("updated").textContent = "暂无数据，请稍后再试";
+        document.getElementById("detectTime").textContent = "暂无数据，请稍后再试";
       });
   </script>
 </body>
